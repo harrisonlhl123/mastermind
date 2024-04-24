@@ -1,10 +1,7 @@
 function MainPage() {
     return (
       <>
-        <p>Mastermind</p>
-        <footer>
-          Copyright &copy; 2024 Mastermind
-        </footer>
+        <p>Game will appear here</p>
       </>
     );
   }
