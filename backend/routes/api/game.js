@@ -1,7 +1,7 @@
 const express = require('express');
 const axios = require('axios');
 const router = express.Router();
-const { isValidGuess } = require('../../gameLogic/gameLogic')
+const { isValidGuess, numExactMatches, numNearMatches, isWin } = require('../../gameLogic/gameLogic');
 
 
 // Route to generate a random 4-number combination
@@ -35,6 +35,7 @@ router.get('/generateCode', async (req, res) => {
 router.post('/guess', (req, res) => {
   try {
     const userGuess = req.body.guess;
+    const generatedCode = req.body.generatedCode; // Assuming you're sending the generated code along with the guess
 
     // Validate the user's guess
     if (!isValidGuess(userGuess)) {
@@ -42,7 +43,23 @@ router.post('/guess', (req, res) => {
       return res.status(400).json({ error: 'Invalid guess. Numbers must be between 0 and 7.' });
     }
 
-    res.status(200).json({ message: `Guess received successfully: ${userGuess}` });
+    // Determine number of exact matches
+    const exactMatches = numExactMatches(generatedCode, userGuess);
+
+    // Determine number of near matches
+    const nearMatches = numNearMatches(generatedCode, userGuess);
+
+    // Check if the user has won
+    const win = isWin(generatedCode, userGuess);
+
+    // Construct response
+    const response = {
+      exactMatches,
+      nearMatches,
+      win,
+    };
+
+    res.status(200).json(response);
   } catch (error) {
     console.error('Error processing guess:', error);
     res.status(500).json({ message: 'Internal server error' });
