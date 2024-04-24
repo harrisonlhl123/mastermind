@@ -67,7 +67,7 @@ function MainPage() {
                     <div>
                         <h2>Guess History</h2>
                         <ul>
-                            {guessHistory.map((guess, index) => (
+                            {[...guessHistory].reverse().map((guess, index) => (
                                 <li key={index}>
                                     <p>Guess: {guess.guess}</p>
                                     <p>Exact Matches: {guess.exactMatches}</p>
