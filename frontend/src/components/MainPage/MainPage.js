@@ -36,8 +36,8 @@ function MainPage() {
     }, [guessResult]); // Update guess history when guessResult changes
 
     const handleSubmitGuess = () => {
-        if (userGuess.length !== 4 || !/^\d+$/.test(userGuess)) {
-            alert('Please enter a 4-digit number.');
+        if (userGuess.length !== 4 || !/^[0-7]+$/.test(userGuess)) {
+            alert('Please enter a 4-digit number containing digits from 0 to 7.');
             return;
         }
 
