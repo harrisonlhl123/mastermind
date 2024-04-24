@@ -56,8 +56,9 @@ function MainPage() {
             {gameState === 'ongoing' && (
                 <div>
                     <h1>Mastermind Game</h1>
+                    <h3>Rules: Enter a 4 digit number where the digits are from 0 to 7.</h3>
                     <p>Attempts Left: {attemptsLeft}</p>
-                    <p>Generated Code: {generatedCode.join(' ')}</p>
+                    {/* <p>Generated Code: {generatedCode.join(' ')}</p> */}
                     <input
                         type="text"
                         value={userGuess}
