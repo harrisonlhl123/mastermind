@@ -14,6 +14,19 @@ function MainPage() {
         dispatch(fetchGeneratedCode());
     }, [dispatch]);
 
+    useEffect(() => {
+        if (guessResult) {
+            const newGuess = {
+                guess: userGuess,
+                exactMatches: guessResult.exactMatches,
+                nearMatches: guessResult.nearMatches
+            };
+            setGuessHistory([...guessHistory, newGuess]);
+            setUserGuess('');
+            setAttemptsLeft(attemptsLeft - 1);
+        }
+    }, [guessResult]); // Update guess history when guessResult changes
+
     const handleSubmitGuess = () => {
         if (userGuess.length !== 4 || !/^\d+$/.test(userGuess)) {
             alert('Please enter a 4-digit number.');
@@ -21,9 +34,6 @@ function MainPage() {
         }
 
         dispatch(sendUserGuess(userGuess.split('').map(Number), generatedCode));
-        setGuessHistory([...guessHistory, userGuess]);
-        setUserGuess('');
-        setAttemptsLeft(attemptsLeft - 1);
     };
 
     return (
@@ -41,20 +51,18 @@ function MainPage() {
                 <h2>Guess History</h2>
                 <ul>
                     {guessHistory.map((guess, index) => (
-                        <li key={index}>{guess}</li>
+                        <li key={index}>
+                            <p>Guess: {guess.guess}</p>
+                            <p>Exact Matches: {guess.exactMatches}</p>
+                            <p>Near Matches: {guess.nearMatches}</p>
+                        </li>
                     ))}
                 </ul>
             </div>
-            {guessResult && (
-                <div>
-                    <h2>Feedback</h2>
-                    <p>Exact Matches: {guessResult.exactMatches}</p>
-                    <p>Near Matches: {guessResult.nearMatches}</p>
-                    <p>Win: {guessResult.win ? 'Yes' : 'No'}</p>
-                </div>
-            )}
         </div>
     );
 }
 
 export default MainPage;
+
+

@@ -3,8 +3,14 @@ import jwtFetch from './jwt';
 // Action types
 const RECEIVE_CODE = "game/RECEIVE_CODE";
 const RECEIVE_GUESS_RESULT = "game/RECEIVE_GUESS_RESULT";
+const CLEAR_GUESS_RESULT = "game/CLEAR_GUESS_RESULT";
+
 
 // Action creators
+const clearGuessResult = () => ({
+    type: CLEAR_GUESS_RESULT
+});
+
 const receiveCode = code => ({
     type: RECEIVE_CODE,
     code
@@ -41,6 +47,7 @@ export const sendUserGuess = (guess, generatedCode) => async dispatch => {
         if (res.ok) {
             const result = await res.json();
             dispatch(receiveGuessResult(result));
+            dispatch(clearGuessResult()); // Dispatch action to clear guess result
         }
     } catch (error) {
         console.error('Error sending user guess:', error);
@@ -60,6 +67,8 @@ const gameReducer = (state = initialState, action) => {
             return { ...state, code: action.code };
         case RECEIVE_GUESS_RESULT:
             return { ...state, guessResult: action.result };
+        case CLEAR_GUESS_RESULT:
+            return { ...state, guessResult: null }; // New case to clear guessResult
         default:
             return state;
     }
