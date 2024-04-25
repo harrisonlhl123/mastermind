@@ -24,35 +24,28 @@ const clearGuessResult = () => ({
 
 // Thunks
 export const fetchGeneratedCode = () => async dispatch => {
-    try {
-        const res = await jwtFetch('/api/game/generateCode');
-        if (res.ok) {
-            const { code } = await res.json();
-            dispatch(receiveCode(code));
-        }
-    } catch (error) {
-        console.error('Error fetching generated code:', error);
-        // Handle error if needed
+    const res = await jwtFetch('/api/game/generateCode');
+    if (res.ok) {
+        // Takes out the array code
+        const { code } = await res.json();
+        dispatch(receiveCode(code));
     }
+
 };
 
 export const sendUserGuess = (guess, generatedCode) => async dispatch => {
-    try {
-        const res = await jwtFetch('/api/game/guess', {
-            method: 'POST',
-            body: JSON.stringify({ guess, generatedCode }),
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        });
-        if (res.ok) {
-            const result = await res.json();
-            dispatch(receiveGuessResult(result));
-            dispatch(clearGuessResult()); // Dispatch action to clear guess result
+    const res = await jwtFetch('/api/game/guess', {
+        method: 'POST',
+        // Stringify 1 parameter, an object
+        body: JSON.stringify({ guess, generatedCode }),
+        headers: {
+            'Content-Type': 'application/json'
         }
-    } catch (error) {
-        console.error('Error sending user guess:', error);
-        // Handle error if needed
+    });
+    if (res.ok) {
+        const result = await res.json();
+        dispatch(receiveGuessResult(result));
+        dispatch(clearGuessResult()); // Dispatch action to clear guess result
     }
 };
 

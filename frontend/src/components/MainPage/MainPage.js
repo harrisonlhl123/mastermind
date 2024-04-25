@@ -4,17 +4,25 @@ import { fetchGeneratedCode, sendUserGuess } from '../../store/game';
 
 function MainPage() {
     const dispatch = useDispatch();
+    // The secret code
     const generatedCode = useSelector(state => state.game.code);
+    // The exactMatch, nearMatch, and win?
     const guessResult = useSelector(state => state.game.guessResult);
+    // User's input
     const [userGuess, setUserGuess] = useState('');
+    // An array to keep track of the user's guess history
     const [guessHistory, setGuessHistory] = useState([]);
+    // Counter for attempts
     const [attemptsLeft, setAttemptsLeft] = useState(10);
-    const [gameState, setGameState] = useState('ongoing'); // 'ongoing', 'won', 'lost'
+    // Indicate if the game's status
+    const [gameState, setGameState] = useState('ongoing');
 
+    // Generate secret code right away
     useEffect(() => {
         dispatch(fetchGeneratedCode());
     }, [dispatch]);
 
+    // Everytime a user guesses, we add that to the guess history, reset the user input, decrease the attempt, and check if the game is over
     useEffect(() => {
         if (guessResult) {
             const newGuess = {
@@ -33,8 +41,10 @@ function MainPage() {
                 setGameState('lost');
             }
         }
-    }, [guessResult]); // Update guess history when guessResult changes
+    }, [guessResult]); // Whenever the user submits a new guess and the result comes back, do this.
 
+
+    // A little error handling on the frontend and dispatch the user's guess.
     const handleSubmitGuess = () => {
         if (userGuess.length !== 4 || !/^[0-7]+$/.test(userGuess)) {
             alert('Please enter a 4-digit number containing digits from 0 to 7.');
@@ -44,6 +54,7 @@ function MainPage() {
         dispatch(sendUserGuess(userGuess.split('').map(Number), generatedCode));
     };
 
+    // After the game ends, restart the game by setting the states to default.
     const handleRestartGame = () => {
         setGuessHistory([]);
         setAttemptsLeft(10);
@@ -83,7 +94,7 @@ function MainPage() {
             {gameState === 'won' && (
                 <div>
                     <h1>Congratulations! You won!</h1>
-                    <p>The secret code was: {generatedCode.join(' ')}</p>
+                    <p>The secret code was: {generatedCode.join('')}</p>
                     <button onClick={handleRestartGame}>Restart Game</button>
                 </div>
             )}
@@ -91,7 +102,7 @@ function MainPage() {
             {gameState === 'lost' && (
                 <div>
                     <h1>Game Over! You lost.</h1>
-                    <p>The secret code was: {generatedCode.join(' ')}</p>
+                    <p>The secret code was: {generatedCode.join('')}</p>
                     <button onClick={handleRestartGame}>Restart Game</button>
                 </div>
             )}
