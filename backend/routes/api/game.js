@@ -23,10 +23,9 @@ router.get('/generateCode', async (req, res) => {
       // Extract the numbers from the response and convert to an array
       const code = response.data.trim().split('\n').map(Number);
   
-      res.status(200).json({ code });
+      return res.status(200).json({ code });
     } catch (error) {
-      console.error('Error generating code:', error);
-      res.status(500).json({ message: 'Internal server error' });
+      res.status(500).json({ message: 'Error generating code' });
     }
 });
 
@@ -35,12 +34,11 @@ router.get('/generateCode', async (req, res) => {
 router.post('/guess', (req, res) => {
   try {
     const userGuess = req.body.guess;
-    const generatedCode = req.body.generatedCode; // Assuming you're sending the generated code along with the guess
+    const generatedCode = req.body.generatedCode;
 
     // Validate the user's guess
-    if (!isValidGuess(userGuess)) {
-      // If the guess is invalid, respond with an error message
-      return res.status(400).json({ error: 'Invalid guess. Numbers must be between 0 and 7.' });
+    if (isValidGuess(userGuess, generatedCode) == false) {
+      return res.status(400).json({ error: 'Invalid guess. Numbers must be between 0-7 and guess must be same length as secret code.' });
     }
 
     // Determine number of exact matches
@@ -52,17 +50,15 @@ router.post('/guess', (req, res) => {
     // Check if the user has won
     const win = isWin(generatedCode, userGuess);
 
-    // Construct response
     const response = {
       exactMatches,
       nearMatches,
       win,
     };
 
-    res.status(200).json(response);
+    return res.status(200).json(response);
   } catch (error) {
-    console.error('Error processing guess:', error);
-    res.status(500).json({ message: 'Internal server error' });
+    return res.status(500).json({ message: 'Not a valid guess. Check userGuess and generatedCode' });
   }
 });
 

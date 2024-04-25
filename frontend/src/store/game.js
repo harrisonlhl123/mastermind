@@ -7,10 +7,6 @@ const CLEAR_GUESS_RESULT = "game/CLEAR_GUESS_RESULT";
 
 
 // Action creators
-const clearGuessResult = () => ({
-    type: CLEAR_GUESS_RESULT
-});
-
 const receiveCode = code => ({
     type: RECEIVE_CODE,
     code
@@ -20,6 +16,11 @@ const receiveGuessResult = result => ({
     type: RECEIVE_GUESS_RESULT,
     result
 });
+
+const clearGuessResult = () => ({
+    type: CLEAR_GUESS_RESULT
+});
+
 
 // Thunks
 export const fetchGeneratedCode = () => async dispatch => {
