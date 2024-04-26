@@ -1,9 +1,15 @@
-const isValidGuess = (guess) => {
-    return guess.every(num => num >= 0 && num <= 7)
+const isValidGuess = (guess, secretCode) => {
+    validNums = guess.every(num => num >= 0 && num <= 7);
+    if (validNums && guess.length == secretCode.length) {
+        return true;
+    } else {
+        return false;
+    }
 }
 
 const numExactMatches = (code, guess) => {
-    return code.filter((num, index) => num === guess[index]).length;
+    const exactMatchesArr = code.filter((num, index) => num === guess[index])
+    return exactMatchesArr.length;
 };
   
 const numNearMatches = (code, guess) => {
@@ -22,9 +28,11 @@ const numNearMatches = (code, guess) => {
     // Then, count the remaining near matches
     for (let i = 0; i < guessCopy.length; i++) {
         if (guessCopy[i] !== null) {
+            // Get the index of the number inside secret code, if it exists
             const codeIndex = codeCopy.indexOf(guessCopy[i]);
             if (codeIndex !== -1) {
                 count++;
+                // Set the number inside of secret code to be null to avoid double counting
                 codeCopy[codeIndex] = null;
             }
         }
