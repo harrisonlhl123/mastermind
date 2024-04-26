@@ -23,8 +23,8 @@ const clearGuessResult = () => ({
 
 
 // Thunks
-export const fetchGeneratedCode = () => async dispatch => {
-    const res = await jwtFetch('/api/game/generateCode');
+export const fetchGeneratedCode = (difficulty) => async dispatch => {
+    const res = await jwtFetch(`/api/game/generateCode?difficulty=${difficulty}`);
     if (res.ok) {
         // Takes out the array code
         const { code } = await res.json();

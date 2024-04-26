@@ -8,12 +8,12 @@ const { isValidGuess, numExactMatches, numNearMatches, isWin } = require('../../
 router.get('/generateCode', async (req, res) => {
     try {
       // Additional feature that allow users to choose a difficulty level
-      const length = req.body.length || 4;
+      const difficulty = req.query.difficulty || 4;
 
       // Make a GET request to the Random Number Generator API based on recommended parameters
       const response = await axios.get('https://www.random.org/integers/', {
         params: {
-          num: length,
+          num: difficulty,
           min: 0,
           max: 7,
           col: 1,
