@@ -17,10 +17,12 @@ function MainPage() {
     // Indicate if the game's status
     const [gameState, setGameState] = useState('ongoing');
 
+    const [difficulty, setDifficulty] = useState(4);
+
     // Generate secret code right away
     useEffect(() => {
-        dispatch(fetchGeneratedCode());
-    }, [dispatch]);
+        dispatch(fetchGeneratedCode(difficulty));
+    }, [dispatch, difficulty]);
 
     // Everytime a user guesses, we add that to the guess history, reset the user input, decrease the attempt, and check if the game is over
     useEffect(() => {
@@ -46,8 +48,8 @@ function MainPage() {
 
     // A little error handling on the frontend and dispatch the user's guess.
     const handleSubmitGuess = () => {
-        if (userGuess.length !== 4 || !/^[0-7]+$/.test(userGuess)) {
-            alert('Please enter a 4-digit number containing digits from 0 to 7.');
+        if (userGuess.length !== difficulty || !/^[0-7]+$/.test(userGuess)) {
+            alert(`Please enter a ${difficulty}-digit number containing digits from 0 to 7.`);
             return;
         }
 
@@ -59,7 +61,7 @@ function MainPage() {
         setGuessHistory([]);
         setAttemptsLeft(10);
         setGameState('ongoing');
-        dispatch(fetchGeneratedCode());
+        dispatch(fetchGeneratedCode(difficulty));
     };
 
     return (
@@ -67,9 +69,17 @@ function MainPage() {
             {gameState === 'ongoing' && (
                 <div>
                     <h1>Mastermind Game</h1>
-                    <h3>Rules: Enter a 4 digit number where the digits are from 0 to 7.</h3>
+
+                    <h3>Rules: Enter a {difficulty} digit number where the digits are from 0 to 7.</h3>
+                    <label>Choose Difficulty:</label>
+                    <select value={difficulty} onChange={(e) => setDifficulty(parseInt(e.target.value))}>
+                        <option value={4}>Easy (4 digits)</option>
+                        <option value={6}>Medium (6 digits)</option>
+                        <option value={8}>Hard (8 digits)</option>
+                    </select>
+
                     <p>Attempts Left: {attemptsLeft}</p>
-                    {/* <p>Generated Code: {generatedCode.join(' ')}</p> */}
+                    <p>Generated Code: {generatedCode.join(' ')}</p>
                     <input
                         type="text"
                         value={userGuess}

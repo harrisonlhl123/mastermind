@@ -7,10 +7,13 @@ const { isValidGuess, numExactMatches, numNearMatches, isWin } = require('../../
 // Route to generate a random 4-number combination
 router.get('/generateCode', async (req, res) => {
     try {
+      // Additional feature that allow users to choose a difficulty level
+      const length = req.body.length || 4;
+
       // Make a GET request to the Random Number Generator API based on recommended parameters
       const response = await axios.get('https://www.random.org/integers/', {
         params: {
-          num: 4,
+          num: length,
           min: 0,
           max: 7,
           col: 1,
