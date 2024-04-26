@@ -1,3 +1,4 @@
+// Checks is a guess is valid by ensuring guess is same length as secret code and numbers are between 0-7
 const isValidGuess = (guess, secretCode) => {
     validNums = guess.every(num => num >= 0 && num <= 7);
     if (validNums && guess.length == secretCode.length) {
@@ -7,11 +8,13 @@ const isValidGuess = (guess, secretCode) => {
     }
 }
 
+// Checks exact matches by filtering numbers that are the same and in the same position and returning the length
 const numExactMatches = (code, guess) => {
     const exactMatchesArr = code.filter((num, index) => num === guess[index])
     return exactMatchesArr.length;
 };
-  
+
+// Checks for near matches
 const numNearMatches = (code, guess) => {
     const codeCopy = [...code];
     const guessCopy = [...guess];
@@ -42,6 +45,7 @@ const numNearMatches = (code, guess) => {
 };
 
 
+// Checks if a user won by checking if exact matches is the same length as the code
 const isWin = (code, guess) => {
     return numExactMatches(code, guess) === code.length;
 };
