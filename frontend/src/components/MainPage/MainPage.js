@@ -45,6 +45,12 @@ function MainPage() {
         }
     }, [guessResult]); // Whenever the user submits a new guess and the result comes back, do this.
 
+    
+    // Restart game whenever the difficulty changes
+    useEffect(() => {
+        handleRestartGame();
+    }, [difficulty]);
+
 
     // A little error handling on the frontend and dispatch the user's guess.
     const handleSubmitGuess = () => {
