@@ -16,13 +16,15 @@ function MainPage() {
     const [attemptsLeft, setAttemptsLeft] = useState(10);
     // Indicate if the game's status
     const [gameState, setGameState] = useState('ongoing');
-
+    // Set default difficulty to 4
     const [difficulty, setDifficulty] = useState(4);
+    
 
-    // Generate secret code right away
+    // Restart game on first load or whenever the difficulty changes
     useEffect(() => {
-        dispatch(fetchGeneratedCode(difficulty));
-    }, [dispatch, difficulty]);
+        handleRestartGame();
+    }, [difficulty]);
+
 
     // Everytime a user guesses, we add that to the guess history, reset the user input, decrease the attempt, and check if the game is over
     useEffect(() => {
@@ -45,11 +47,7 @@ function MainPage() {
         }
     }, [guessResult]); // Whenever the user submits a new guess and the result comes back, do this.
 
-    
-    // Restart game whenever the difficulty changes
-    useEffect(() => {
-        handleRestartGame();
-    }, [difficulty]);
+
 
 
     // A little error handling on the frontend and dispatch the user's guess.
@@ -85,7 +83,7 @@ function MainPage() {
                     </select>
 
                     <p>Attempts Left: {attemptsLeft}</p>
-                    <p>Generated Code: {generatedCode.join(' ')}</p>
+                    {/* <p>Generated Code: {generatedCode.join(' ')}</p> */}
                     <input
                         type="text"
                         value={userGuess}
