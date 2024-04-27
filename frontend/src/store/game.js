@@ -112,12 +112,10 @@ export const saveNewGame = (gameData) => async (dispatch) => {
         body: JSON.stringify(gameData)
       });
   
-      if (!response.ok) {
-        throw new Error('Failed to save game');
+      if (response.ok) {
+          // Game saved successfully
+          dispatch(saveGameProgressSuccess());
       }
-  
-      // Game saved successfully
-      dispatch(saveGameProgressSuccess());
     } catch (error) {
       console.error('Error saving game:', error);
       dispatch(saveGameProgressFail());
@@ -135,12 +133,10 @@ export const updateExistingGame = (gameId, gameData) => async (dispatch) => {
         body: JSON.stringify(gameData)
       });
   
-      if (!response.ok) {
-        throw new Error('Failed to update game');
+      if (response.ok) {
+          // Game updated successfully
+          dispatch(saveGameProgressSuccess());
       }
-  
-      // Game updated successfully
-      dispatch(saveGameProgressSuccess());
     } catch (error) {
       console.error('Error updating game:', error);
       dispatch(saveGameProgressFail());
@@ -156,8 +152,6 @@ export const fetchGameHistory = (userId) => async dispatch => {
             const data = await res.json();
             const gameHistory = data.gameHistory;
             dispatch(receiveGameHistory(gameHistory));
-        } else {
-            dispatch({ type: FETCH_GAME_HISTORY_FAIL });
         }
     } catch (error) {
         console.error('Error fetching game history:', error);
@@ -173,8 +167,6 @@ export const fetchGame = (gameId) => async dispatch => {
         if (res.ok) {
             const game = await res.json();
             dispatch(receiveGame(game));
-        } else {
-            dispatch(receiveGameFail());
         }
     } catch (error) {
         console.error('Error fetching game:', error);
@@ -185,7 +177,7 @@ export const fetchGame = (gameId) => async dispatch => {
 
 // Clear selectedGame every time user visits the profile page so the correct game gets updated in the state
 export const clearSelectedGameThunk = () => dispatch => {
-    dispatch({ type: CLEAR_SELECTED_GAME });
+    dispatch(clearSelectedGame());
 };
 
 
@@ -203,8 +195,6 @@ export const requestHint = (generatedCode) => async dispatch => {
         if (res.ok) {
             const { hint } = await res.json();
             dispatch(receiveHint(hint));
-        } else {
-            throw new Error('Failed to request hint');
         }
     } catch (error) {
         console.error('Error requesting hint:', error);
