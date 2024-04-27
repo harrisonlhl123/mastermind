@@ -1,34 +1,44 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchGeneratedCode, sendUserGuess, requestHint, saveNewGame } from '../../store/game';
+import { useHistory, useParams } from 'react-router-dom';
+import { fetchGame, sendUserGuess, updateExistingGame, requestHint } from '../../store/game';
 
-function MainPage() {
+function GamePage() {
+    const { gameId } = useParams(); // Get the gameId from the route params
     const dispatch = useDispatch();
-    // The secret code
-    const generatedCode = useSelector(state => state.game.code);
-    // The exactMatch, nearMatch, and win?
-    const guessResult = useSelector(state => state.game.guessResult);
-    // User's input
+    const history = useHistory();
+
+    const game = useSelector(state => state.game.selectedGame?.game);
+
+
     const [userGuess, setUserGuess] = useState('');
-    // An array to keep track of the user's guess history
+    // const [guessHistory, setGuessHistory] = useState(game?.guessHistory);
+    // const [attemptsLeft, setAttemptsLeft] = useState(game?.attemptsLeft);
+    // const [gameState, setGameState] = useState(game?.gameState);
     const [guessHistory, setGuessHistory] = useState([]);
-    // Counter for attempts
-    const [attemptsLeft, setAttemptsLeft] = useState(10);
-    // Indicate if the game's status
+    const [attemptsLeft, setAttemptsLeft] = useState(0);
     const [gameState, setGameState] = useState('ongoing');
-    // Set default difficulty to 4
-    const [difficulty, setDifficulty] = useState(4);
-    // Get hint when user clicks on hint
+    const [length, setLength] = useState(4)
+    const [generatedCode, setGeneratedCode] = useState([1,2,3,4])
+
+    const guessResult = useSelector(state => state.game.guessResult);
+
     const hint = useSelector(state => state.game.hint)
 
-    const currentUser = useSelector(state => state.session.user);
-    
-
-    // Restart game on first load or whenever the difficulty changes
     useEffect(() => {
-        handleRestartGame();
-    }, [difficulty]);
+        dispatch(fetchGame(gameId));
+    }, [gameId]);
 
+    // Update local state when game changes
+    useEffect(() => {
+        if (game) {
+            setGuessHistory(game.guessHistory);
+            setAttemptsLeft(game.attemptsLeft);
+            setGameState(game.gameState);
+            setLength(game.secretCode.length);
+            setGeneratedCode(game.secretCode);
+        }
+    }, [game]);
 
     // Everytime a user guesses, we add that to the guess history, reset the user input, decrease the attempt, and check if the game is over
     useEffect(() => {
@@ -51,65 +61,52 @@ function MainPage() {
         }
     }, [guessResult]); // Whenever the user submits a new guess and the result comes back, do this.
 
-
-
-    // A little error handling on the frontend and dispatch the user's guess.
     const handleSubmitGuess = () => {
-        if (userGuess.length !== difficulty || !/^[0-7]+$/.test(userGuess)) {
-            alert(`Please enter a ${difficulty}-digit number containing digits from 0 to 7.`);
+        if (userGuess.length !== game.secretCode.length || !/^[0-7]+$/.test(userGuess)) {
+            alert(`Please enter a ${game.secretCode.length}-digit number containing digits from 0 to 7.`);
             return;
         }
 
-        dispatch(sendUserGuess(userGuess.split('').map(Number), generatedCode));
+        dispatch(sendUserGuess(userGuess.split('').map(Number), game.secretCode));
     };
 
-    // After the game ends, restart the game by setting the states to default.
-    const handleRestartGame = () => {
-        setGuessHistory([]);
-        setAttemptsLeft(10);
-        setGameState('ongoing');
-        dispatch(fetchGeneratedCode(difficulty));
-    };
-
-    // Handle getting hint
     const requestHintHandler = () => {
         dispatch(requestHint(generatedCode));
     };
 
     const handleSaveProgress = () => {
-        if (!currentUser) {
-            alert('Please log in to save your progress.');
-            return;
-        }
-
         const gameData = {
-            user: currentUser._id,
-            secretCode: generatedCode,
             guessHistory: guessHistory,
             attemptsLeft: attemptsLeft,
             gameState: gameState,
         };
+        dispatch(updateExistingGame(gameId, gameData));
 
-        dispatch(saveNewGame(gameData))
-            .then(() => {
-                handleRestartGame();
-            });
+        history.push('/profile');
     };
 
 
+    useEffect(() => {
+        if (gameState === 'won' || gameState === 'lost') {
+            handleEndProgress();
+        }
+    }, [gameState]);
+
+    const handleEndProgress = () => {
+        const gameData = {
+            guessHistory: guessHistory,
+            attemptsLeft: attemptsLeft,
+            gameState: gameState,
+        };
+        dispatch(updateExistingGame(gameId, gameData));
+    }
+
     return (
         <div>
+            {console.log(game)}
             {gameState === 'ongoing' && (
                 <div>
-                    <h1>Mastermind Game</h1>
-
-                    <h3>Rules: Enter a {difficulty} digit number where the digits are from 0 to 7.</h3>
-                    <label>Choose Difficulty:</label>
-                    <select value={difficulty} onChange={(e) => setDifficulty(parseInt(e.target.value))}>
-                        <option value={4}>Easy (4 digits)</option>
-                        <option value={6}>Medium (6 digits)</option>
-                        <option value={8}>Hard (8 digits)</option>
-                    </select>
+                    <h3>Rules: Enter a {length} digit number where the digits are from 0 to 7.</h3>
 
                     <p>Attempts Left: {attemptsLeft}</p>
                     {/* <p>Generated Code: {generatedCode.join(' ')}</p> */}
@@ -119,12 +116,11 @@ function MainPage() {
                         onChange={(e) => setUserGuess(e.target.value)}
                     />
                     <button onClick={handleSubmitGuess}>Submit Guess</button>
-                    
-                    {currentUser && <button onClick={handleSaveProgress}>Save Progress</button>}
+
+                    <button onClick={handleSaveProgress}>Save Progress</button>
 
                     <button onClick={requestHintHandler}>Hint</button>
                     <p>Hint: {hint}</p>
-
 
                     <div>
                         <h2>Guess History</h2>
@@ -144,20 +140,18 @@ function MainPage() {
             {gameState === 'won' && (
                 <div>
                     <h1>Congratulations! You won!</h1>
-                    <p>The secret code was: {generatedCode.join('')}</p>
-                    <button onClick={handleRestartGame}>Restart Game</button>
+                    <p>The secret code was: {game.secretCode.join('')}</p>
                 </div>
             )}
 
             {gameState === 'lost' && (
                 <div>
                     <h1>Game Over! You lost.</h1>
-                    <p>The secret code was: {generatedCode.join('')}</p>
-                    <button onClick={handleRestartGame}>Restart Game</button>
+                    <p>The secret code was: {game.secretCode.join('')}</p>
                 </div>
             )}
         </div>
-    );
+    )
 }
 
-export default MainPage;
+export default GamePage;
