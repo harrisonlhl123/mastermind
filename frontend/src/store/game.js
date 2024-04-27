@@ -7,11 +7,7 @@ const CLEAR_GUESS_RESULT = "game/CLEAR_GUESS_RESULT";
 const RECEIVE_HINT = "game/RECEIVE_HINT";
 const CLEAR_HINT = "game/CLEAR_HINT";
 const RECEIVE_GAME_HISTORY = "game/RECEIVE_GAME_HISTORY";
-const FETCH_GAME_HISTORY_FAIL = "game/FETCH_GAME_HISTORY_FAIL";
 const RECEIVE_GAME = "game/RECEIVE_GAME";
-const RECEIVE_GAME_FAIL = "game/RECEIVE_GAME_FAIL";
-const SAVE_GAME_PROGRESS_SUCCESS = "game/SAVE_GAME_PROGRESS_SUCCESS";
-const SAVE_GAME_PROGRESS_FAIL = "game/SAVE_GAME_PROGRESS_FAIL";
 const CLEAR_SELECTED_GAME = "game/CLEAR_SELECTED_GAME";
 
 
@@ -47,18 +43,6 @@ const receiveGameHistory = gameHistory => ({
 const receiveGame = game => ({
     type: RECEIVE_GAME,
     game
-});
-
-const receiveGameFail = () => ({
-    type: RECEIVE_GAME_FAIL
-});
-
-const saveGameProgressSuccess = () => ({
-    type: SAVE_GAME_PROGRESS_SUCCESS
-});
-
-const saveGameProgressFail = () => ({
-    type: SAVE_GAME_PROGRESS_FAIL
 });
 
 const clearSelectedGame = () => ({
@@ -113,12 +97,11 @@ export const saveNewGame = (gameData) => async (dispatch) => {
       });
   
       if (response.ok) {
-          // Game saved successfully
-          dispatch(saveGameProgressSuccess());
+        // Game saved successfully
+        console.log("Game saved successfully")
       }
     } catch (error) {
       console.error('Error saving game:', error);
-      dispatch(saveGameProgressFail());
     }
 };
 
@@ -134,12 +117,11 @@ export const updateExistingGame = (gameId, gameData) => async (dispatch) => {
       });
   
       if (response.ok) {
-          // Game updated successfully
-          dispatch(saveGameProgressSuccess());
+        // Game updated successfully
+        console.log("Game updated successfully")
       }
     } catch (error) {
       console.error('Error updating game:', error);
-      dispatch(saveGameProgressFail());
     }
 };
   
@@ -155,7 +137,6 @@ export const fetchGameHistory = (userId) => async dispatch => {
         }
     } catch (error) {
         console.error('Error fetching game history:', error);
-        dispatch({ type: FETCH_GAME_HISTORY_FAIL });
     }
 };
 
@@ -170,7 +151,6 @@ export const fetchGame = (gameId) => async dispatch => {
         }
     } catch (error) {
         console.error('Error fetching game:', error);
-        dispatch(receiveGameFail());
     }
 };
 
@@ -206,9 +186,7 @@ const initialState = {
     code: [],
     guessResult: null,
     hint: '',
-    saveGameSuccess: false,
     gameHistory: [],
-    fetchGameHistoryFail: false,
     selectedGame: null,
 };
 
@@ -229,21 +207,12 @@ const gameReducer = (state = initialState, action) => {
         // Clears the hint after every guess
         case CLEAR_HINT:
             return { ...state, hint: '' };
-        // Boolean to know if game got saved or updated successfully
-        case SAVE_GAME_PROGRESS_SUCCESS:
-            return { ...state, saveGameSuccess: true };
-        case SAVE_GAME_PROGRESS_FAIL:
-            return { ...state, saveGameSuccess: false };
-        // Gets the gameHistory and boolean to see if it's successful
+        // Gets the gameHistory
         case RECEIVE_GAME_HISTORY:
-            return { ...state, gameHistory: action.gameHistory, fetchGameHistoryFail: false };
-        case FETCH_GAME_HISTORY_FAIL:
-            return { ...state, fetchGameHistoryFail: true };
+            return { ...state, gameHistory: action.gameHistory };
         // Fetches the selectedGame
         case RECEIVE_GAME:
             return { ...state, selectedGame: action.game };
-        case RECEIVE_GAME_FAIL:
-            return { ...state, selectedGame: null };
         // Clears the selectedGame when users go to their profile
         case CLEAR_SELECTED_GAME:
             return { ...state, selectedGame: null };
