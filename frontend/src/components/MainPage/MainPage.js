@@ -18,7 +18,7 @@ function MainPage() {
     const [gameState, setGameState] = useState('ongoing');
     // Set default difficulty to 4
     const [difficulty, setDifficulty] = useState(4);
-    
+    // Get hint when user clicks on hint
     const hint = useSelector(state => state.game.hint)
     
 
@@ -51,7 +51,6 @@ function MainPage() {
 
 
 
-
     // A little error handling on the frontend and dispatch the user's guess.
     const handleSubmitGuess = () => {
         if (userGuess.length !== difficulty || !/^[0-7]+$/.test(userGuess)) {
@@ -70,8 +69,9 @@ function MainPage() {
         dispatch(fetchGeneratedCode(difficulty));
     };
 
+    // Handle getting hint
     const requestHintHandler = () => {
-        dispatch(requestHint(generatedCode)); // Dispatch requestHint action with generatedCode
+        dispatch(requestHint(generatedCode));
     };
 
     return (
@@ -96,8 +96,10 @@ function MainPage() {
                         onChange={(e) => setUserGuess(e.target.value)}
                     />
                     <button onClick={handleSubmitGuess}>Submit Guess</button>
+
                     <button onClick={requestHintHandler}>Hint</button>
                     <p>Hint: {hint}</p>
+
                     <div>
                         <h2>Guess History</h2>
                         <ul>

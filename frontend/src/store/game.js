@@ -5,6 +5,7 @@ const RECEIVE_CODE = "game/RECEIVE_CODE";
 const RECEIVE_GUESS_RESULT = "game/RECEIVE_GUESS_RESULT";
 const CLEAR_GUESS_RESULT = "game/CLEAR_GUESS_RESULT";
 const RECEIVE_HINT = "game/RECEIVE_HINT";
+const CLEAR_HINT = "game/CLEAR_HINT";
 
 
 // Action creators
@@ -25,6 +26,10 @@ const clearGuessResult = () => ({
 const receiveHint = hint => ({
     type: RECEIVE_HINT,
     hint
+});
+
+const clearHint = () => ({
+    type: CLEAR_HINT
 });
 
 
@@ -51,7 +56,8 @@ export const sendUserGuess = (guess, generatedCode) => async dispatch => {
     if (res.ok) {
         const result = await res.json();
         dispatch(receiveGuessResult(result));
-        dispatch(clearGuessResult()); // Dispatch action to clear guess result
+        dispatch(clearGuessResult());
+        dispatch(clearHint());
     }
 };
 
@@ -94,6 +100,8 @@ const gameReducer = (state = initialState, action) => {
             return { ...state, guessResult: null }; // New case to clear guessResult
         case RECEIVE_HINT:
             return { ...state, hint: action.hint };
+        case CLEAR_HINT:
+            return { ...state, hint: '' };
         default:
             return state;
     }
