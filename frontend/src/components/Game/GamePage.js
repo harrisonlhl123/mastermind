@@ -4,27 +4,27 @@ import { useHistory, useParams } from 'react-router-dom';
 import { fetchGame, sendUserGuess, updateExistingGame, requestHint } from '../../store/game';
 
 function GamePage() {
-    const { gameId } = useParams(); // Get the gameId from the route params
+    // Get the gameId from the route params
+    const { gameId } = useParams(); 
     const dispatch = useDispatch();
     const history = useHistory();
-
+    // Get the selectedGame from the store
     const game = useSelector(state => state.game.selectedGame?.game);
 
-
+    // Set some default states before game is fetched and stored
     const [userGuess, setUserGuess] = useState('');
-    // const [guessHistory, setGuessHistory] = useState(game?.guessHistory);
-    // const [attemptsLeft, setAttemptsLeft] = useState(game?.attemptsLeft);
-    // const [gameState, setGameState] = useState(game?.gameState);
     const [guessHistory, setGuessHistory] = useState([]);
     const [attemptsLeft, setAttemptsLeft] = useState(0);
     const [gameState, setGameState] = useState('ongoing');
     const [length, setLength] = useState(4)
     const [generatedCode, setGeneratedCode] = useState([1,2,3,4])
 
+    // The exactMatch, nearMatch, and win?
     const guessResult = useSelector(state => state.game.guessResult);
-
+    // // Get hint when user clicks on hint
     const hint = useSelector(state => state.game.hint)
 
+    // On load or when gameId changes, get the game
     useEffect(() => {
         dispatch(fetchGame(gameId));
     }, [gameId]);
@@ -61,6 +61,7 @@ function GamePage() {
         }
     }, [guessResult]); // Whenever the user submits a new guess and the result comes back, do this.
 
+    // A little error handling on the frontend and dispatch the user's guess.
     const handleSubmitGuess = () => {
         if (userGuess.length !== game.secretCode.length || !/^[0-7]+$/.test(userGuess)) {
             alert(`Please enter a ${game.secretCode.length}-digit number containing digits from 0 to 7.`);
@@ -70,10 +71,12 @@ function GamePage() {
         dispatch(sendUserGuess(userGuess.split('').map(Number), game.secretCode));
     };
 
+    // Handle getting hint
     const requestHintHandler = () => {
         dispatch(requestHint(generatedCode));
     };
 
+    // Update the game and then send the user back to their profile to clear the selectedGame state
     const handleSaveProgress = () => {
         const gameData = {
             guessHistory: guessHistory,
@@ -85,13 +88,14 @@ function GamePage() {
         history.push('/profile');
     };
 
-
+    // When a player wins or lose, save it in their history
     useEffect(() => {
         if (gameState === 'won' || gameState === 'lost') {
             handleEndProgress();
         }
     }, [gameState]);
 
+    // Update the game when a user wins or lose
     const handleEndProgress = () => {
         const gameData = {
             guessHistory: guessHistory,
@@ -103,7 +107,6 @@ function GamePage() {
 
     return (
         <div>
-            {console.log(game)}
             {gameState === 'ongoing' && (
                 <div>
                     <h3>Rules: Enter a {length} digit number where the digits are from 0 to 7.</h3>

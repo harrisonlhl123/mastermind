@@ -20,7 +20,7 @@ function MainPage() {
     const [difficulty, setDifficulty] = useState(4);
     // Get hint when user clicks on hint
     const hint = useSelector(state => state.game.hint)
-
+    // Get the currentUser if there is one
     const currentUser = useSelector(state => state.session.user);
     
 
@@ -76,6 +76,7 @@ function MainPage() {
         dispatch(requestHint(generatedCode));
     };
 
+    // Save game for the first time and start a new game after
     const handleSaveProgress = () => {
         if (!currentUser) {
             alert('Please log in to save your progress.');
