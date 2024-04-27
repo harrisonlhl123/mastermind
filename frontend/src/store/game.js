@@ -4,6 +4,8 @@ import jwtFetch from './jwt';
 const RECEIVE_CODE = "game/RECEIVE_CODE";
 const RECEIVE_GUESS_RESULT = "game/RECEIVE_GUESS_RESULT";
 const CLEAR_GUESS_RESULT = "game/CLEAR_GUESS_RESULT";
+const RECEIVE_HINT = "game/RECEIVE_HINT";
+const CLEAR_HINT = "game/CLEAR_HINT";
 
 
 // Action creators
@@ -19,6 +21,15 @@ const receiveGuessResult = result => ({
 
 const clearGuessResult = () => ({
     type: CLEAR_GUESS_RESULT
+});
+
+const receiveHint = hint => ({
+    type: RECEIVE_HINT,
+    hint
+});
+
+const clearHint = () => ({
+    type: CLEAR_HINT
 });
 
 
@@ -45,14 +56,38 @@ export const sendUserGuess = (guess, generatedCode) => async dispatch => {
     if (res.ok) {
         const result = await res.json();
         dispatch(receiveGuessResult(result));
-        dispatch(clearGuessResult()); // Dispatch action to clear guess result
+        dispatch(clearGuessResult());
+        dispatch(clearHint());
+    }
+};
+
+
+export const requestHint = (generatedCode) => async dispatch => {
+    try {
+        const res = await jwtFetch('/api/game/hints', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ generatedCode })
+        });
+
+        if (res.ok) {
+            const { hint } = await res.json();
+            dispatch(receiveHint(hint));
+        } else {
+            throw new Error('Failed to request hint');
+        }
+    } catch (error) {
+        console.error('Error requesting hint:', error);
     }
 };
 
 // Reducer
 const initialState = {
     code: [],
-    guessResult: null
+    guessResult: null,
+    hint: ''
 };
 
 const gameReducer = (state = initialState, action) => {
@@ -63,6 +98,10 @@ const gameReducer = (state = initialState, action) => {
             return { ...state, guessResult: action.result };
         case CLEAR_GUESS_RESULT:
             return { ...state, guessResult: null }; // New case to clear guessResult
+        case RECEIVE_HINT:
+            return { ...state, hint: action.hint };
+        case CLEAR_HINT:
+            return { ...state, hint: '' };
         default:
             return state;
     }

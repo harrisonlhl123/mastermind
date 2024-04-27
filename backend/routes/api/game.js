@@ -66,4 +66,25 @@ router.post('/guess', (req, res) => {
 });
 
 
+// Route for hints
+router.post('/hints', (req, res) => {
+  try {
+      const generatedCode = req.body.generatedCode; // Get the generated code array from the request body
+
+      // Randomly select a position for the hint
+      const hintPosition = Math.floor(Math.random() * generatedCode.length);
+
+      // Construct the hint message
+      const hintMessage = `Position ${hintPosition + 1} is ${generatedCode[hintPosition]}.`;
+
+      return res.status(200).json({ hint: hintMessage });
+  } catch (error) {
+      return res.status(500).json({ message: 'Error generating hint' });
+  }
+});
+
+
+
+
+
 module.exports = router;

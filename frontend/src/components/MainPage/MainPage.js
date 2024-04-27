@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchGeneratedCode, sendUserGuess } from '../../store/game';
+import { fetchGeneratedCode, sendUserGuess, requestHint } from '../../store/game';
 
 function MainPage() {
     const dispatch = useDispatch();
@@ -18,6 +18,8 @@ function MainPage() {
     const [gameState, setGameState] = useState('ongoing');
     // Set default difficulty to 4
     const [difficulty, setDifficulty] = useState(4);
+    // Get hint when user clicks on hint
+    const hint = useSelector(state => state.game.hint)
     
 
     // Restart game on first load or whenever the difficulty changes
@@ -49,7 +51,6 @@ function MainPage() {
 
 
 
-
     // A little error handling on the frontend and dispatch the user's guess.
     const handleSubmitGuess = () => {
         if (userGuess.length !== difficulty || !/^[0-7]+$/.test(userGuess)) {
@@ -66,6 +67,11 @@ function MainPage() {
         setAttemptsLeft(10);
         setGameState('ongoing');
         dispatch(fetchGeneratedCode(difficulty));
+    };
+
+    // Handle getting hint
+    const requestHintHandler = () => {
+        dispatch(requestHint(generatedCode));
     };
 
     return (
@@ -90,6 +96,10 @@ function MainPage() {
                         onChange={(e) => setUserGuess(e.target.value)}
                     />
                     <button onClick={handleSubmitGuess}>Submit Guess</button>
+
+                    <button onClick={requestHintHandler}>Hint</button>
+                    <p>Hint: {hint}</p>
+
                     <div>
                         <h2>Guess History</h2>
                         <ul>
