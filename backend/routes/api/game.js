@@ -71,7 +71,9 @@ router.post('/guess', (req, res) => {
 // Route for hints
 router.post('/hints', (req, res) => {
   try {
-      const generatedCode = req.body.generatedCode; // Get the generated code array from the request body
+
+      // Get the generated code array from the request body
+      const generatedCode = req.body.generatedCode; 
 
       // Randomly select a position for the hint
       const hintPosition = Math.floor(Math.random() * generatedCode.length);
@@ -90,7 +92,11 @@ router.post('/hints', (req, res) => {
 // Route to save a new game session
 router.post('/saveGame', requireUser, async (req, res) => {
   try {
+
+      // Parameters needed to save a game
       const { user, secretCode, guessHistory, attemptsLeft, gameState } = req.body;
+
+      // Try to save the game
       const game = new Game({
           user,
           secretCode,
@@ -98,7 +104,9 @@ router.post('/saveGame', requireUser, async (req, res) => {
           attemptsLeft,
           gameState,
       });
+
       await game.save();
+
       res.status(201).json({ message: 'Game saved successfully' });
   } catch (error) {
       res.status(500).json({ error: 'Failed to save game' });
@@ -109,7 +117,11 @@ router.post('/saveGame', requireUser, async (req, res) => {
 // Route to get game history for a user
 router.get('/gameHistory/:userId', requireUser, async (req, res) => {
   try {
+
+      // Parameter's userId
       const userId = req.params.userId;
+
+      // requireUser middleware
       const authenticatedUserId = req.user.id;
 
       // Check if the requested user ID matches the authenticated user ID
@@ -117,6 +129,7 @@ router.get('/gameHistory/:userId', requireUser, async (req, res) => {
           return res.status(403).json({ message: 'Unauthorized access to user game history' });
       }
 
+      // Find all the games with that userId as reference
       const gameHistory = await Game.find({ user: userId }).sort({ createdAt: -1 });
       
       res.status(200).json({ gameHistory });
@@ -129,7 +142,11 @@ router.get('/gameHistory/:userId', requireUser, async (req, res) => {
 // Route to get a specific game belonging to the logged-in user
 router.get('/:gameId', requireUser, async (req, res) => {
   try {
+
+      // The gameId from the parameter
       const gameId = req.params.gameId;
+
+      // requireUser middleware
       const authenticatedUserId = req.user.id;
 
       // Find the game by ID
@@ -148,17 +165,19 @@ router.get('/:gameId', requireUser, async (req, res) => {
       // Return the game data
       res.status(200).json({ game });
   } catch (error) {
-      console.error('Error retrieving game:', error);
       res.status(500).json({ error: 'Failed to retrieve game' });
   }
 });
 
 
-
 // Route to update an existing game session
 router.patch('/updateGame/:gameId', requireUser, async (req, res) => {
   try {
+
+      // The gameId from the parameter
       const gameId = req.params.gameId;
+
+      // The parts we want to change
       const { guessHistory, attemptsLeft, gameState } = req.body;
 
       // Find the game session by ID
@@ -169,7 +188,7 @@ router.patch('/updateGame/:gameId', requireUser, async (req, res) => {
           return res.status(404).json({ error: 'Game not found' });
       }
 
-      // Extend the existing guess history with the new array of guesses
+      // Update the guessHistory, attemptsLeft, and gameState
       game.guessHistory = guessHistory;
       game.attemptsLeft = attemptsLeft;
       game.gameState = gameState;
