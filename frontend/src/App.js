@@ -9,7 +9,7 @@ import MainPage from './components/MainPage/MainPage';
 import LoginForm from './components/SessionForms/LoginForm';
 import SignupForm from './components/SessionForms/SignupForm';
 import ProfilePage from './components/Profile/ProfilePage';
-// import GamePage from './components/Game/GamePage';
+import GamePage from './components/Game/GamePage';
 
 import { getCurrentUser } from './store/session';
 import { Route } from 'react-router-dom/cjs/react-router-dom.min';
@@ -30,7 +30,7 @@ function App() {
         <AuthRoute exact path="/signup" component={SignupForm} />
 
         <ProtectedRoute exact path="/profile" component={ProfilePage} />
-        {/* <ProtectedRoute exact path="/game/:gameId" component={GamePage} /> */}
+        <ProtectedRoute exact path="/game/:gameId" component={GamePage} />
       </Switch>
     </>
   );
