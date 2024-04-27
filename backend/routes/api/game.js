@@ -184,8 +184,4 @@ router.patch('/updateGame/:gameId', requireUser, async (req, res) => {
 });
 
 
-
-
-
-
 module.exports = router;
