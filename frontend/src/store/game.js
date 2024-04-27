@@ -68,6 +68,8 @@ const clearSelectedGame = () => ({
 
 
 // Thunks
+
+// Makes the secretCode
 export const fetchGeneratedCode = (difficulty) => async dispatch => {
     const res = await jwtFetch(`/api/game/generateCode?difficulty=${difficulty}`);
     if (res.ok) {
@@ -75,9 +77,10 @@ export const fetchGeneratedCode = (difficulty) => async dispatch => {
         const { code } = await res.json();
         dispatch(receiveCode(code));
     }
-
 };
 
+
+// Sends the user guess and returns info like exact matches, near matches, win?
 export const sendUserGuess = (guess, generatedCode) => async dispatch => {
     const res = await jwtFetch('/api/game/guess', {
         method: 'POST',
@@ -90,13 +93,15 @@ export const sendUserGuess = (guess, generatedCode) => async dispatch => {
     if (res.ok) {
         const result = await res.json();
         dispatch(receiveGuessResult(result));
+
+        // Clear the guess result and hint
         dispatch(clearGuessResult());
         dispatch(clearHint());
     }
 };
 
 
-// Thunk action to save a new game session
+// Save a new game
 export const saveNewGame = (gameData) => async (dispatch) => {
     try {
       const response = await jwtFetch('/api/game/saveGame', {
@@ -116,11 +121,10 @@ export const saveNewGame = (gameData) => async (dispatch) => {
     } catch (error) {
       console.error('Error saving game:', error);
       dispatch(saveGameProgressFail());
-      // Dispatch error action or handle error as needed
     }
 };
 
-// Thunk action to update an existing game session
+// Update an existing game
 export const updateExistingGame = (gameId, gameData) => async (dispatch) => {
     try {
       const response = await jwtFetch(`/api/game/updateGame/${gameId}`, {
@@ -140,12 +144,11 @@ export const updateExistingGame = (gameId, gameData) => async (dispatch) => {
     } catch (error) {
       console.error('Error updating game:', error);
       dispatch(saveGameProgressFail());
-      // Dispatch error action or handle error as needed
     }
 };
   
 
-
+// Get a user's game history
 export const fetchGameHistory = (userId) => async dispatch => {
     try {
         const res = await jwtFetch(`/api/game/gameHistory/${userId}`);
@@ -163,6 +166,7 @@ export const fetchGameHistory = (userId) => async dispatch => {
 };
 
 
+// Get a specific game
 export const fetchGame = (gameId) => async dispatch => {
     try {
         const res = await jwtFetch(`/api/game/${gameId}`);
@@ -178,12 +182,14 @@ export const fetchGame = (gameId) => async dispatch => {
     }
 };
 
+
+// Clear selectedGame every time user visits the profile page so the correct game gets updated in the state
 export const clearSelectedGameThunk = () => dispatch => {
     dispatch({ type: CLEAR_SELECTED_GAME });
 };
 
 
-
+// Creates the hint
 export const requestHint = (generatedCode) => async dispatch => {
     try {
         const res = await jwtFetch('/api/game/hints', {
@@ -218,28 +224,37 @@ const initialState = {
 
 const gameReducer = (state = initialState, action) => {
     switch(action.type) {
+        // Sets code to be the secretCode
         case RECEIVE_CODE:
             return { ...state, code: action.code };
+        // Sets guessResult to be the guessResult
         case RECEIVE_GUESS_RESULT:
             return { ...state, guessResult: action.result };
+        // Sets guessResult to null after every guess
         case CLEAR_GUESS_RESULT:
-            return { ...state, guessResult: null }; // New case to clear guessResult
+            return { ...state, guessResult: null };
+        // Sets hint to hint
         case RECEIVE_HINT:
             return { ...state, hint: action.hint };
+        // Clears the hint after every guess
         case CLEAR_HINT:
             return { ...state, hint: '' };
+        // Boolean to know if game got saved or updated successfully
         case SAVE_GAME_PROGRESS_SUCCESS:
             return { ...state, saveGameSuccess: true };
         case SAVE_GAME_PROGRESS_FAIL:
             return { ...state, saveGameSuccess: false };
+        // Gets the gameHistory and boolean to see if it's successful
         case RECEIVE_GAME_HISTORY:
             return { ...state, gameHistory: action.gameHistory, fetchGameHistoryFail: false };
         case FETCH_GAME_HISTORY_FAIL:
             return { ...state, fetchGameHistoryFail: true };
+        // Fetches the selectedGame
         case RECEIVE_GAME:
             return { ...state, selectedGame: action.game };
         case RECEIVE_GAME_FAIL:
-            return { ...state, selectedGame: null }; // Handle failure to receive game data
+            return { ...state, selectedGame: null };
+        // Clears the selectedGame when users go to their profile
         case CLEAR_SELECTED_GAME:
             return { ...state, selectedGame: null };
         default:
