@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchGeneratedCode, sendUserGuess, requestHint } from '../../store/game';
+import { fetchGeneratedCode, sendUserGuess, requestHint, saveNewGame } from '../../store/game';
 
 function MainPage() {
     const dispatch = useDispatch();
@@ -20,6 +20,8 @@ function MainPage() {
     const [difficulty, setDifficulty] = useState(4);
     // Get hint when user clicks on hint
     const hint = useSelector(state => state.game.hint)
+
+    const currentUser = useSelector(state => state.session.user);
     
 
     // Restart game on first load or whenever the difficulty changes
@@ -74,6 +76,27 @@ function MainPage() {
         dispatch(requestHint(generatedCode));
     };
 
+    const handleSaveProgress = () => {
+        if (!currentUser) {
+            alert('Please log in to save your progress.');
+            return;
+        }
+
+        const gameData = {
+            user: currentUser._id,
+            secretCode: generatedCode,
+            guessHistory: guessHistory,
+            attemptsLeft: attemptsLeft,
+            gameState: gameState,
+        };
+
+        dispatch(saveNewGame(gameData))
+            .then(() => {
+                handleRestartGame();
+            });
+    };
+
+
     return (
         <div>
             {gameState === 'ongoing' && (
@@ -99,6 +122,8 @@ function MainPage() {
 
                     <button onClick={requestHintHandler}>Hint</button>
                     <p>Hint: {hint}</p>
+
+                    {currentUser && <button onClick={handleSaveProgress}>Save Progress</button>}
 
                     <div>
                         <h2>Guess History</h2>
