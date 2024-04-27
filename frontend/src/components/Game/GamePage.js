@@ -117,10 +117,10 @@ function GamePage() {
                     />
                     <button onClick={handleSubmitGuess}>Submit Guess</button>
 
+                    <button onClick={handleSaveProgress}>Save Progress</button>
+
                     <button onClick={requestHintHandler}>Hint</button>
                     <p>Hint: {hint}</p>
-
-                    <button onClick={handleSaveProgress}>Save Progress</button>
 
                     <div>
                         <h2>Guess History</h2>

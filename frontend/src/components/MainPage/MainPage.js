@@ -119,11 +119,12 @@ function MainPage() {
                         onChange={(e) => setUserGuess(e.target.value)}
                     />
                     <button onClick={handleSubmitGuess}>Submit Guess</button>
+                    
+                    {currentUser && <button onClick={handleSaveProgress}>Save Progress</button>}
 
                     <button onClick={requestHintHandler}>Hint</button>
                     <p>Hint: {hint}</p>
 
-                    {currentUser && <button onClick={handleSaveProgress}>Save Progress</button>}
 
                     <div>
                         <h2>Guess History</h2>
