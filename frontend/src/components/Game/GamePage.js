@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory, useParams } from 'react-router-dom';
-import { fetchGame, sendUserGuess, updateExistingGame } from '../../store/game';
+import { fetchGame, sendUserGuess, updateExistingGame, requestHint } from '../../store/game';
 
 function GamePage() {
     const { gameId } = useParams(); // Get the gameId from the route params
@@ -19,8 +19,11 @@ function GamePage() {
     const [attemptsLeft, setAttemptsLeft] = useState(0);
     const [gameState, setGameState] = useState('ongoing');
     const [length, setLength] = useState(4)
+    const [generatedCode, setGeneratedCode] = useState([1,2,3,4])
 
     const guessResult = useSelector(state => state.game.guessResult);
+
+    const hint = useSelector(state => state.game.hint)
 
     useEffect(() => {
         dispatch(fetchGame(gameId));
@@ -33,6 +36,7 @@ function GamePage() {
             setAttemptsLeft(game.attemptsLeft);
             setGameState(game.gameState);
             setLength(game.secretCode.length);
+            setGeneratedCode(game.secretCode);
         }
     }, [game]);
 
@@ -64,6 +68,10 @@ function GamePage() {
         }
 
         dispatch(sendUserGuess(userGuess.split('').map(Number), game.secretCode));
+    };
+
+    const requestHintHandler = () => {
+        dispatch(requestHint(generatedCode));
     };
 
     const handleSaveProgress = () => {
@@ -108,6 +116,9 @@ function GamePage() {
                         onChange={(e) => setUserGuess(e.target.value)}
                     />
                     <button onClick={handleSubmitGuess}>Submit Guess</button>
+
+                    <button onClick={requestHintHandler}>Hint</button>
+                    <p>Hint: {hint}</p>
 
                     <button onClick={handleSaveProgress}>Save Progress</button>
 
