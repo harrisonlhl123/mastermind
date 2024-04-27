@@ -2,6 +2,8 @@ const express = require('express');
 const axios = require('axios');
 const router = express.Router();
 const { isValidGuess, numExactMatches, numNearMatches, isWin } = require('../../gameLogic/gameLogic');
+const Game = require('../../models/Game');
+const { requireUser } = require('../../config/passport');
 
 
 // Route to generate a random 4-number combination
@@ -82,6 +84,105 @@ router.post('/hints', (req, res) => {
       return res.status(500).json({ message: 'Error generating hint' });
   }
 });
+
+
+
+// Route to save a new game session
+router.post('/saveGame', requireUser, async (req, res) => {
+  try {
+      const { user, secretCode, guessHistory, attemptsLeft, gameState } = req.body;
+      const game = new Game({
+          user,
+          secretCode,
+          guessHistory,
+          attemptsLeft,
+          gameState,
+      });
+      await game.save();
+      res.status(201).json({ message: 'Game saved successfully' });
+  } catch (error) {
+      res.status(500).json({ error: 'Failed to save game' });
+  }
+});
+
+
+// Route to get game history for a user
+router.get('/gameHistory/:userId', requireUser, async (req, res) => {
+  try {
+      const userId = req.params.userId;
+      const authenticatedUserId = req.user.id;
+
+      // Check if the requested user ID matches the authenticated user ID
+      if (userId !== authenticatedUserId) {
+          return res.status(403).json({ message: 'Unauthorized access to user game history' });
+      }
+
+      const gameHistory = await Game.find({ user: userId }).sort({ createdAt: -1 });
+      
+      res.status(200).json({ gameHistory });
+  } catch (error) {
+      res.status(500).json({ error: 'Failed to retrieve game history' });
+  }
+});
+
+
+// Route to get a specific game belonging to the logged-in user
+router.get('/:gameId', requireUser, async (req, res) => {
+  try {
+      const gameId = req.params.gameId;
+      const authenticatedUserId = req.user.id;
+
+      // Find the game by ID
+      const game = await Game.findById(gameId);
+
+      // Check if the game exists
+      if (!game) {
+          return res.status(404).json({ error: 'Game not found' });
+      }
+
+      // Check if the game belongs to the authenticated user
+      if (game.user.toString() !== authenticatedUserId) {
+          return res.status(403).json({ error: 'Unauthorized access to game' });
+      }
+
+      // Return the game data
+      res.status(200).json({ game });
+  } catch (error) {
+      console.error('Error retrieving game:', error);
+      res.status(500).json({ error: 'Failed to retrieve game' });
+  }
+});
+
+
+
+// Route to update an existing game session
+router.patch('/updateGame/:gameId', requireUser, async (req, res) => {
+  try {
+      const gameId = req.params.gameId;
+      const { guessHistory, attemptsLeft, gameState } = req.body;
+
+      // Find the game session by ID
+      const game = await Game.findById(gameId);
+
+      // Check if the game session exists
+      if (!game) {
+          return res.status(404).json({ error: 'Game not found' });
+      }
+
+      // Extend the existing guess history with the new array of guesses
+      game.guessHistory = guessHistory;
+      game.attemptsLeft = attemptsLeft;
+      game.gameState = gameState;
+
+      // Save the updated game session
+      await game.save();
+
+      res.status(200).json({ message: 'Game updated successfully' });
+  } catch (error) {
+      res.status(500).json({ error: 'Failed to update game' });
+  }
+});
+
 
 
 

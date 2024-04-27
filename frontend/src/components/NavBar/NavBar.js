@@ -32,7 +32,10 @@ function NavBar () {
 
   return (
     <>
-      <h1>Mastermind</h1>
+      <Link to="/">
+        <h1>Mastermind</h1>
+      </Link>
+      <p>Login to save progress and retrieve old games</p>
       { getLinks() }
     </>
   );
