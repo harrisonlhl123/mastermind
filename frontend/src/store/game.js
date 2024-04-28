@@ -64,7 +64,7 @@ export const fetchGeneratedCode = (difficulty) => async dispatch => {
 };
 
 
-// Sends the user guess and returns info like exact matches, near matches, win?
+// Sends the user guess and returns info like exact matches, correct numbers, win?
 export const sendUserGuess = (guess, generatedCode) => async dispatch => {
     const res = await jwtFetch('/api/game/guess', {
         method: 'POST',

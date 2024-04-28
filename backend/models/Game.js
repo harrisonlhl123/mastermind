@@ -19,7 +19,7 @@ const gameSchema = new Schema({
             exactMatches: {
                 type: Number,
             },
-            nearMatches: {
+            correctNumbers: {
                 type: Number,
             }
         }],

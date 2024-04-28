@@ -1,7 +1,7 @@
 const express = require('express');
 const axios = require('axios');
 const router = express.Router();
-const { isValidGuess, numExactMatches, numNearMatches, isWin } = require('../../gameLogic/gameLogic');
+const { isValidGuess, numExactMatches, numCorrectNumbers, isWin } = require('../../gameLogic/gameLogic');
 const Game = require('../../models/Game');
 const { requireUser } = require('../../config/passport');
 
@@ -49,15 +49,15 @@ router.post('/guess', (req, res) => {
     // Determine number of exact matches
     const exactMatches = numExactMatches(generatedCode, userGuess);
 
-    // Determine number of near matches
-    const nearMatches = numNearMatches(generatedCode, userGuess);
+    // Determine number of correct numbers
+    const correctNumbers = numCorrectNumbers(generatedCode, userGuess);
 
     // Check if the user has won
     const win = isWin(generatedCode, userGuess);
 
     const response = {
       exactMatches,
-      nearMatches,
+      correctNumbers,
       win,
     };
 

@@ -14,30 +14,19 @@ const numExactMatches = (code, guess) => {
     return exactMatchesArr.length;
 };
 
-// Checks for near matches
-const numNearMatches = (code, guess) => {
+// Checks for correct numbers
+const numCorrectNumbers = (code, guess) => {
     const codeCopy = [...code];
     const guessCopy = [...guess];
     let count = 0;
 
-    // First, check for exact matches and mark them
+    // Count the correct matches
     for (let i = 0; i < guessCopy.length; i++) {
-        if (guessCopy[i] === codeCopy[i]) {
-            guessCopy[i] = null;
-            codeCopy[i] = null;
-        }
-    }
-
-    // Then, count the remaining near matches
-    for (let i = 0; i < guessCopy.length; i++) {
-        if (guessCopy[i] !== null) {
-            // Get the index of the number inside secret code, if it exists
-            const codeIndex = codeCopy.indexOf(guessCopy[i]);
-            if (codeIndex !== -1) {
-                count++;
-                // Set the number inside of secret code to be null to avoid double counting
-                codeCopy[codeIndex] = null;
-            }
+        const codeIndex = codeCopy.indexOf(guessCopy[i]);
+        if (codeIndex !== -1) {
+            count++;
+            // Set the number inside of secret code to be null to avoid double counting
+            codeCopy[codeIndex] = null;
         }
     }
 
@@ -53,6 +42,6 @@ const isWin = (code, guess) => {
 module.exports = {
     isValidGuess,
     numExactMatches,
-    numNearMatches,
+    numCorrectNumbers,
     isWin,
 };

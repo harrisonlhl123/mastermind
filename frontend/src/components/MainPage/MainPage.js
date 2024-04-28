@@ -6,7 +6,7 @@ function MainPage() {
     const dispatch = useDispatch();
     // The secret code
     const generatedCode = useSelector(state => state.game.code);
-    // The exactMatch, nearMatch, and win?
+    // The exactMatch, correctNumbers, and win?
     const guessResult = useSelector(state => state.game.guessResult);
     // User's input
     const [userGuess, setUserGuess] = useState('');
@@ -36,7 +36,7 @@ function MainPage() {
             const newGuess = {
                 guess: userGuess,
                 exactMatches: guessResult.exactMatches,
-                nearMatches: guessResult.nearMatches
+                correctNumbers: guessResult.correctNumbers
             };
             setGuessHistory([...guessHistory, newGuess]);
             setUserGuess('');
@@ -113,7 +113,7 @@ function MainPage() {
                     </select>
 
                     <p>Attempts Left: {attemptsLeft}</p>
-                    {/* <p>Generated Code: {generatedCode.join(' ')}</p> */}
+                    <p>Generated Code: {generatedCode.join(' ')}</p>
                     <input
                         type="text"
                         value={userGuess}
@@ -134,7 +134,7 @@ function MainPage() {
                                 <li key={index}>
                                     <p>Guess: {guess.guess}</p>
                                     <p>Exact Matches: {guess.exactMatches}</p>
-                                    <p>Near Matches: {guess.nearMatches}</p>
+                                    <p>Correct Numbers: {guess.correctNumbers}</p>
                                 </li>
                             ))}
                         </ul>
