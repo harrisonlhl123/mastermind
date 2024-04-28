@@ -19,10 +19,10 @@ To run this project locally, follow these steps:
 3. Open your web browser and navigate to http://localhost:3000 to view the application.
 
 ## Features
-* User Authentication: Users can sign up, log in, and log out.
 * Gameplay: Users guess the secret code and will be given feedback for exact matches and correct numbers.
 * Difficulty: Users can adjust the difficulty by choosing how long the code should be.
 * Hints: Users can press on "Hint" and an exact match will be given to them.
+* User Authentication: Users can sign up, log in, and log out.
 * Saving: Users who log in can save their games and view them later.
 
 ## Code structure
