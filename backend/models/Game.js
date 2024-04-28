@@ -14,7 +14,7 @@ const gameSchema = new Schema({
     guessHistory: {
         type: [{
             guess: {
-                type: [Number],
+                type: String,
             },
             exactMatches: {
                 type: Number,
