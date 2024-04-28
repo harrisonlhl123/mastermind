@@ -79,9 +79,9 @@ function GamePage() {
     // Update the game and then send the user back to their profile to clear the selectedGame state
     const handleSaveProgress = () => {
         const gameData = {
-            guessHistory: guessHistory,
-            attemptsLeft: attemptsLeft,
-            gameState: gameState,
+            guessHistory,
+            attemptsLeft,
+            gameState,
         };
         dispatch(updateExistingGame(gameId, gameData));
 

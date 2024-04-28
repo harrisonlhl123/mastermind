@@ -86,9 +86,9 @@ function MainPage() {
         const gameData = {
             user: currentUser._id,
             secretCode: generatedCode,
-            guessHistory: guessHistory,
-            attemptsLeft: attemptsLeft,
-            gameState: gameState,
+            guessHistory,
+            attemptsLeft,
+            gameState,
         };
 
         dispatch(saveNewGame(gameData))
