@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import './NavBar.css';
 import { logout } from '../../store/session';
+import { clearGameHistoryThunk } from '../../store/game';
 
 function NavBar () {
   const loggedIn = useSelector(state => !!state.session.user);
@@ -10,6 +11,7 @@ function NavBar () {
   const logoutUser = e => {
       e.preventDefault();
       dispatch(logout());
+      dispatch(clearGameHistoryThunk());
   }
 
   const getLinks = () => {

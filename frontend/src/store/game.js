@@ -7,6 +7,7 @@ const CLEAR_GUESS_RESULT = "game/CLEAR_GUESS_RESULT";
 const RECEIVE_HINT = "game/RECEIVE_HINT";
 const CLEAR_HINT = "game/CLEAR_HINT";
 const RECEIVE_GAME_HISTORY = "game/RECEIVE_GAME_HISTORY";
+const CLEAR_GAME_HISTORY = 'game/CLEAR_GAME_HISTORY';
 const RECEIVE_GAME = "game/RECEIVE_GAME";
 const CLEAR_SELECTED_GAME = "game/CLEAR_SELECTED_GAME";
 
@@ -39,6 +40,10 @@ const receiveGameHistory = gameHistory => ({
     type: RECEIVE_GAME_HISTORY,
     gameHistory
 });
+
+const clearGameHistory = () => ({
+    type: CLEAR_GAME_HISTORY
+})
 
 const receiveGame = game => ({
     type: RECEIVE_GAME,
@@ -141,6 +146,11 @@ export const fetchGameHistory = (userId) => async dispatch => {
 };
 
 
+export const clearGameHistoryThunk = () => async (dispatch) => {
+    dispatch(clearGameHistory());
+}
+
+
 // Get a specific game
 export const fetchGame = (gameId) => async dispatch => {
     try {
@@ -210,6 +220,8 @@ const gameReducer = (state = initialState, action) => {
         // Gets the gameHistory
         case RECEIVE_GAME_HISTORY:
             return { ...state, gameHistory: action.gameHistory };
+        case CLEAR_GAME_HISTORY:
+            return {...state, gameHistory: [] };
         // Fetches the selectedGame
         case RECEIVE_GAME:
             return { ...state, selectedGame: action.game };
