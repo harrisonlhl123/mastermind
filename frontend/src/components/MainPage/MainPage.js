@@ -113,7 +113,7 @@ function MainPage() {
                     </select>
 
                     <p>Attempts Left: {attemptsLeft}</p>
-                    <p>Generated Code: {generatedCode.join(' ')}</p>
+                    {/* <p>Generated Code: {generatedCode.join(' ')}</p> */}
                     <input
                         type="text"
                         value={userGuess}
