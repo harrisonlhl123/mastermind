@@ -16,21 +16,25 @@ const numExactMatches = (code, guess) => {
 
 // Checks for correct numbers
 const numCorrectNumbers = (code, guess) => {
-    const codeCopy = [...code];
-    const guessCopy = [...guess];
-    let count = 0;
+    let secretCodeHash = {}
+    let count = 0
 
-    // Count the correct matches
-    for (let i = 0; i < guessCopy.length; i++) {
-        const codeIndex = codeCopy.indexOf(guessCopy[i]);
-        if (codeIndex !== -1) {
-            count++;
-            // Set the number inside of secret code to be null to avoid double counting
-            codeCopy[codeIndex] = null;
+    code.forEach((ele) => {
+        if (ele in secretCodeHash) {
+            secretCodeHash[ele]++
+        } else {
+            secretCodeHash[ele] = 1
         }
-    }
+    })
 
-    return count;
+    guess.forEach((ele) => {
+        if (ele in secretCodeHash && secretCodeHash[ele] > 0) {
+            count++
+            secretCodeHash[ele]--
+        }
+    })
+
+    return count
 };
 
 
