@@ -13,12 +13,12 @@ const CLEAR_SELECTED_GAME = "game/CLEAR_SELECTED_GAME";
 
 
 // Action creators
-const receiveCode = code => ({
+const receiveCode = (code) => ({
     type: RECEIVE_CODE,
     code
 });
 
-const receiveGuessResult = result => ({
+const receiveGuessResult = (result) => ({
     type: RECEIVE_GUESS_RESULT,
     result
 });
@@ -27,7 +27,7 @@ const clearGuessResult = () => ({
     type: CLEAR_GUESS_RESULT
 });
 
-const receiveHint = hint => ({
+const receiveHint = (hint) => ({
     type: RECEIVE_HINT,
     hint
 });
@@ -36,7 +36,7 @@ const clearHint = () => ({
     type: CLEAR_HINT
 });
 
-const receiveGameHistory = gameHistory => ({
+const receiveGameHistory = (gameHistory) => ({
     type: RECEIVE_GAME_HISTORY,
     gameHistory
 });
@@ -45,7 +45,7 @@ const clearGameHistory = () => ({
     type: CLEAR_GAME_HISTORY
 })
 
-const receiveGame = game => ({
+const receiveGame = (game) => ({
     type: RECEIVE_GAME,
     game
 });
@@ -58,34 +58,64 @@ const clearSelectedGame = () => ({
 
 // Thunks
 
-// Makes the secretCode
-export const fetchGeneratedCode = (difficulty) => async dispatch => {
-    const res = await jwtFetch(`/api/game/generateCode?difficulty=${difficulty}`);
-    if (res.ok) {
-        // Takes out the array code
-        const { code } = await res.json();
-        dispatch(receiveCode(code));
+// Gets the secretCode
+export const fetchGeneratedCode = (difficulty) => async (dispatch) => {
+    try {
+        const res = await jwtFetch(`/api/game/generateCode?difficulty=${difficulty}`);
+        if (res.ok) {
+            // Takes out the array code
+            const { code } = await res.json();
+            dispatch(receiveCode(code));
+        }
+    } catch(error) {
+        console.error('Error fetching code', error)
     }
 };
 
 
 // Sends the user guess and returns info like exact matches, correct numbers, win?
-export const sendUserGuess = (guess, generatedCode) => async dispatch => {
-    const res = await jwtFetch('/api/game/guess', {
-        method: 'POST',
-        // Stringify 1 parameter, an object
-        body: JSON.stringify({ guess, generatedCode }),
-        headers: {
-            'Content-Type': 'application/json'
+export const sendUserGuess = (guess, generatedCode) => async (dispatch) => {
+    try {
+        const res = await jwtFetch('/api/game/guess', {
+            method: 'POST',
+            // Stringify 1 parameter, an object
+            body: JSON.stringify({ guess, generatedCode }),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        if (res.ok) {
+            const result = await res.json();
+            dispatch(receiveGuessResult(result));
+    
+            // Clear the guess result and hint
+            dispatch(clearGuessResult());
+            dispatch(clearHint());
         }
-    });
-    if (res.ok) {
-        const result = await res.json();
-        dispatch(receiveGuessResult(result));
+    } catch(error) {
+        console.error('Error sending guess', error)
+    }
+};
 
-        // Clear the guess result and hint
-        dispatch(clearGuessResult());
-        dispatch(clearHint());
+
+// Creates the hint
+export const requestHint = (generatedCode) => async (dispatch) => {
+    try {
+        const res = await jwtFetch('/api/game/hints', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            // Creates a key generatedCode inside the body, which is what the backend expects
+            body: JSON.stringify({ generatedCode })
+        });
+
+        if (res.ok) {
+            const { hint } = await res.json();
+            dispatch(receiveHint(hint));
+        }
+    } catch (error) {
+        console.error('Error requesting hint:', error);
     }
 };
 
@@ -132,7 +162,7 @@ export const updateExistingGame = (gameId, gameData) => async (dispatch) => {
   
 
 // Get a user's game history
-export const fetchGameHistory = (userId) => async dispatch => {
+export const fetchGameHistory = (userId) => async (dispatch) => {
     try {
         const res = await jwtFetch(`/api/game/gameHistory/${userId}`);
         if (res.ok) {
@@ -152,7 +182,7 @@ export const clearGameHistoryThunk = () => async (dispatch) => {
 
 
 // Get a specific game
-export const fetchGame = (gameId) => async dispatch => {
+export const fetchGame = (gameId) => async (dispatch) => {
     try {
         const res = await jwtFetch(`/api/game/${gameId}`);
         if (res.ok) {
@@ -166,30 +196,10 @@ export const fetchGame = (gameId) => async dispatch => {
 
 
 // Clear selectedGame every time user visits the profile page so the correct game gets updated in the state
-export const clearSelectedGameThunk = () => dispatch => {
+export const clearSelectedGameThunk = () => async (dispatch) => {
     dispatch(clearSelectedGame());
 };
 
-
-// Creates the hint
-export const requestHint = (generatedCode) => async dispatch => {
-    try {
-        const res = await jwtFetch('/api/game/hints', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ generatedCode })
-        });
-
-        if (res.ok) {
-            const { hint } = await res.json();
-            dispatch(receiveHint(hint));
-        }
-    } catch (error) {
-        console.error('Error requesting hint:', error);
-    }
-};
 
 // Reducer
 const initialState = {

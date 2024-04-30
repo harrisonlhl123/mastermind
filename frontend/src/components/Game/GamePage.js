@@ -63,7 +63,7 @@ function GamePage() {
 
     // A little error handling on the frontend and dispatch the user's guess.
     const handleSubmitGuess = () => {
-        if (userGuess.length !== game.secretCode.length || !/^[0-7]+$/.test(userGuess)) {
+        if (userGuess.length != game.secretCode.length || !/^[0-7]+$/.test(userGuess)) {
             alert(`Please enter a ${game.secretCode.length}-digit number containing digits from 0 to 7.`);
             return;
         }

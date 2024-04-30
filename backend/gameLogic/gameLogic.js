@@ -19,6 +19,7 @@ const numCorrectNumbers = (code, guess) => {
     let secretCodeHash = {}
     let count = 0
 
+    // Create a hash to store the secret code
     code.forEach((ele) => {
         if (ele in secretCodeHash) {
             secretCodeHash[ele]++
@@ -27,6 +28,7 @@ const numCorrectNumbers = (code, guess) => {
         }
     })
 
+    // Go through guess and if the key exists and the value is greater than 1, it's a match
     guess.forEach((ele) => {
         if (ele in secretCodeHash && secretCodeHash[ele] > 0) {
             count++
