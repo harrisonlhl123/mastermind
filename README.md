@@ -39,6 +39,10 @@ router.post('/saveGame', requireUser, async (req, res) => {
       // Parameters needed to save a game
       const { user, secretCode, guessHistory, attemptsLeft, gameState } = req.body;
 
+      if (user != req.user.id) {
+        return res.status(403).json({ error: 'Unauthorized to save game' })
+      }
+
       // Try to save the game
       const game = new Game({
           user,
@@ -50,9 +54,10 @@ router.post('/saveGame', requireUser, async (req, res) => {
 
       await game.save();
 
-      res.status(201).json({ message: 'Game saved successfully' });
+      return res.status(201).json({ message: 'Game saved successfully' });
   } catch (error) {
-      res.status(500).json({ error: 'Failed to save game' });
+      console.error(error)
+      return res.status(500).json({ error: 'Failed to save game' });
   }
 });
 ```
