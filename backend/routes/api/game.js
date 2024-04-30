@@ -30,7 +30,8 @@ router.get('/generateCode', async (req, res) => {
   
       return res.status(200).json({ code });
     } catch (error) {
-      res.status(500).json({ message: 'Error generating code' });
+      console.error(error)
+      return res.status(500).json({ message: 'Error generating code' });
     }
 });
 
@@ -63,6 +64,7 @@ router.post('/guess', (req, res) => {
 
     return res.status(200).json(response);
   } catch (error) {
+    console.error(error)
     return res.status(500).json({ message: 'Not a valid guess. Check userGuess and generatedCode' });
   }
 });
@@ -83,6 +85,7 @@ router.post('/hints', (req, res) => {
 
       return res.status(200).json({ hint: hintMessage });
   } catch (error) {
+      console.error(error)
       return res.status(500).json({ message: 'Error generating hint' });
   }
 });
@@ -96,6 +99,10 @@ router.post('/saveGame', requireUser, async (req, res) => {
       // Parameters needed to save a game
       const { user, secretCode, guessHistory, attemptsLeft, gameState } = req.body;
 
+      if (user != req.user.id) {
+        return res.status(403).json({ error: 'Unauthorized to save game' })
+      }
+
       // Try to save the game
       const game = new Game({
           user,
@@ -107,9 +114,10 @@ router.post('/saveGame', requireUser, async (req, res) => {
 
       await game.save();
 
-      res.status(201).json({ message: 'Game saved successfully' });
+      return res.status(201).json({ message: 'Game saved successfully' });
   } catch (error) {
-      res.status(500).json({ error: 'Failed to save game' });
+      console.error(error)
+      return res.status(500).json({ error: 'Failed to save game' });
   }
 });
 
@@ -125,7 +133,7 @@ router.get('/gameHistory/:userId', requireUser, async (req, res) => {
       const authenticatedUserId = req.user.id;
 
       // Check if the requested user ID matches the authenticated user ID
-      if (userId !== authenticatedUserId) {
+      if (userId != authenticatedUserId) {
           return res.status(403).json({ message: 'Unauthorized access to user game history' });
       }
 
@@ -134,7 +142,8 @@ router.get('/gameHistory/:userId', requireUser, async (req, res) => {
       
       res.status(200).json({ gameHistory });
   } catch (error) {
-      res.status(500).json({ error: 'Failed to retrieve game history' });
+      console.error(error)
+      return res.status(500).json({ error: 'Failed to retrieve game history' });
   }
 });
 
@@ -158,14 +167,15 @@ router.get('/:gameId', requireUser, async (req, res) => {
       }
 
       // Check if the game belongs to the authenticated user
-      if (game.user.toString() !== authenticatedUserId) {
+      if (game.user != authenticatedUserId) {
           return res.status(403).json({ error: 'Unauthorized access to game' });
       }
 
       // Return the game data
       res.status(200).json({ game });
   } catch (error) {
-      res.status(500).json({ error: 'Failed to retrieve game' });
+      console.error(error)
+      return res.status(500).json({ error: 'Failed to retrieve game' });
   }
 });
 
@@ -173,34 +183,42 @@ router.get('/:gameId', requireUser, async (req, res) => {
 // Route to update an existing game session
 router.patch('/updateGame/:gameId', requireUser, async (req, res) => {
   try {
+    const gameId = req.params.gameId
 
-      // The gameId from the parameter
-      const gameId = req.params.gameId;
+    // Make sure the found game don't save if it's not the right user
+    const foundGame = await Game.findById(gameId)
+    if (foundGame.user != req.user.id) {
+      return res.status(403).json({ message: 'Unauthorized' })
+    }
 
-      // The parts we want to change
-      const { guessHistory, attemptsLeft, gameState } = req.body;
+    // Update the game if it is the right user
+    const game = await Game.findByIdAndUpdate(
+      // Find the game based on its ID
+      { _id: gameId },
+      // Use the $set operator to update the specified fields
+      {
+        $set: {
+          guessHistory: req.body.guessHistory,
+          attemptsLeft: req.body.attemptsLeft,
+          gameState: req.body.gameState,
+        }
+      },
+      // new: true to reeturn the updated game instead of the original one
+      { new: true }
+    )
+    
+    if (!game) {
+      return res.status(404).json({ message: 'Game not found' })
+    }
 
-      // Find the game session by ID
-      const game = await Game.findById(gameId);
+    await game.save()
 
-      // Check if the game session exists
-      if (!game) {
-          return res.status(404).json({ error: 'Game not found' });
-      }
-
-      // Update the guessHistory, attemptsLeft, and gameState
-      game.guessHistory = guessHistory;
-      game.attemptsLeft = attemptsLeft;
-      game.gameState = gameState;
-
-      // Save the updated game session
-      await game.save();
-
-      res.status(200).json({ message: 'Game updated successfully' });
-  } catch (error) {
-      res.status(500).json({ error: 'Failed to update game' });
+    return res.status(200).json({ message: 'Game updated successfully' })
+  } catch(error) {
+    console.error(error)
+    return res.status(500).json({ message: 'Failed to update game' })
   }
-});
+})
 
 
 module.exports = router;
