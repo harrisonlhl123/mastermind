@@ -10,7 +10,7 @@ const { requireUser } = require('../../config/passport');
 router.get('/generateCode', async (req, res) => {
     try {
       // Additional feature that allow users to choose a difficulty level
-      const difficulty = req.query.difficulty || 4;
+      const difficulty = req.query.difficulty;
 
       // Make a GET request to the Random Number Generator API based on recommended parameters
       const response = await axios.get('https://www.random.org/integers/', {
@@ -24,7 +24,7 @@ router.get('/generateCode', async (req, res) => {
           rnd: 'new'
         }
       });
-      
+
       // Extract the numbers from the response and convert to an array
       const code = response.data.trim().split('\n').map(Number);
   
@@ -203,7 +203,7 @@ router.patch('/updateGame/:gameId', requireUser, async (req, res) => {
           gameState: req.body.gameState,
         }
       },
-      // new: true to reeturn the updated game instead of the original one
+      // new: true to return the updated game instead of the original one
       { new: true }
     )
     
