@@ -6,17 +6,29 @@ Welcome to Mastermind! This project is a web application built using the MERN st
 
 To run this project locally, follow these steps:
 
-1. Navigate to the backend directory and run this command to start the backend server:
+1. Navigate to the backend directory and run this command to install dependencies:
+   ```
+   npm install
+   ```
+
+2. Navigate to the frontend directory and run this command to install dependencies:
+   ```
+   npm install
+   ```
+
+3. Navigate to the backend directory and make a new file called .env and paste in the information from the PDF sent through email.
+
+4. Navigate to the backend directory and run this command to start the backend server:
    ```
    npm run dev
    ```
 
-2. Open a new terminal window and navigate to the frontend directory and run this command to start the frontend server:
+5. Open a new terminal window and navigate to the frontend directory and run this command to start the frontend server:
    ```
    npm start
    ```
 
-3. Open your web browser and navigate to http://localhost:3000 to view the application.
+6. Open your web browser and navigate to http://localhost:3000 to view the application.
 
 ## Features
 * Gameplay: Users guess the secret code and will be given feedback for exact matches and correct numbers.
