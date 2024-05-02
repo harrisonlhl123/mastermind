@@ -16,7 +16,7 @@ To run this project locally, follow these steps:
    npm install
    ```
 
-3. Navigate to the backend directory and make a new file called .env and paste in the information from the PDF sent through email.
+3. Navigate to the backend directory and make a new file called .env and paste in the information sent through the email.
 
 4. Navigate to the backend directory and run this command to start the backend server:
    ```
