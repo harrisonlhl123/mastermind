@@ -9,7 +9,6 @@ To run this project locally, follow these steps:
 1. Navigate to the backend directory and run this command to install dependencies:
    ```
    npm install
-   npm install axios
    ```
 
 2. Navigate to the frontend directory and run this command to install dependencies:
